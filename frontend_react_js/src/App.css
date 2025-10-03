@@ -1,15 +1,18 @@
 /* Root variables for Ocean Professional theme */
 :root {
-  --primary: #2563EB;
-  --secondary: #F59E0B;
-  --error: #EF4444;
-  --background: #f9fafb;
+  --color-primary: #2563EB;
+  --color-secondary: #F59E0B;
+  --color-error: #EF4444;
   --surface: #ffffff;
+  --bg: #f9fafb;
   --text: #111827;
+  --layer-depth: 26px;
+  --ocean-grad: linear-gradient(180deg, #ffffff 0%, #f3f6fc 100%);
+  --win-line-grad: linear-gradient(135deg, #2563EB 0%, #F59E0B 100%);
 }
 
 .App {
-  background-color: var(--background);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(249, 250, 251, 1));
   min-height: 100vh;
   padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -18,43 +21,99 @@
 /* Game board perspective and 3D effects */
 .board-3d {
   transform-style: preserve-3d;
-  transition: transform 0.5s ease;
+  perspective: 900px;
+  perspective-origin: 50% 35%;
+  transition: transform 0.3s ease;
+}
+
+.board-3d-container {
+  transform-style: preserve-3d;
+  transform: rotateX(18deg) rotateZ(0deg);
+  transition: transform 0.3s ease;
 }
 
 .layer-grid {
+  transform-style: preserve-3d;
   transition: transform 0.3s ease, opacity 0.3s ease;
+  position: relative;
 }
 
-.layer-grid:hover {
-  transform: translateZ(10px);
+.layer-grid::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.15);
+  pointer-events: none;
+}
+
+/* Cell 3D effects */
+.game-cell {
+  transform-style: preserve-3d;
+  background: var(--ocean-grad);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.game-cell:not(:disabled):hover {
+  transform: translateZ(6px) rotateX(-2deg) rotateY(2deg);
+  box-shadow: 
+    0 8px 24px rgba(37, 99, 235, 0.15),
+    0 2px 6px rgba(0, 0, 0, 0.1),
+    0 0 12px rgba(245, 158, 11, 0.2);
+}
+
+.game-cell:focus {
+  outline: none;
+  box-shadow: 
+    0 0 0 2px var(--color-secondary),
+    0 8px 24px rgba(37, 99, 235, 0.15);
+}
+
+/* Winning line 3D effect */
+.winning-line {
+  position: absolute;
+  background: var(--win-line-grad);
+  filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.4));
+  transform-style: preserve-3d;
+  animation: winPulse 2s ease-in-out infinite;
+}
+
+@keyframes winPulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* Cell placement animation */
+.game-cell.placed {
+  animation: placePiece 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+@keyframes placePiece {
+  0% {
+    transform: translateZ(-20px) scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: translateZ(0) scale(1);
+    opacity: 1;
+  }
 }
 
 /* Responsive design */
 @media (max-width: 600px) {
   .board-3d {
     transform: scale(0.8);
+    perspective: 700px;
   }
 }
 
-/* Accessibility focus styles */
-button:focus {
-  outline: 3px solid var(--secondary);
-  outline-offset: 2px;
-}
-
-/* Animation for cell placement */
-.game-cell {
-  transform-origin: center;
-  animation: place-piece 0.3s ease-out;
-}
-
-@keyframes place-piece {
-  from {
-    transform: scale(0.5);
-    opacity: 0;
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .board-3d, .layer-grid, .game-cell {
+    transition: none;
   }
-  to {
-    transform: scale(1);
-    opacity: 1;
+  
+  .winning-line {
+    animation: none;
   }
 }

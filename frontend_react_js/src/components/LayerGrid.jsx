@@ -3,6 +3,9 @@ import Cell from './Cell';
 import { BOARD_SIZE } from '../game/constants';
 
 const LayerGrid = ({ layer, board, onCellClick, winningLine, disabled, layerIndex }) => {
+  const scale = 1 - (layerIndex * 0.02); // Subtle scale reduction for depth
+  const zTranslate = layerIndex * 26; // Using CSS variable value
+
   const gridStyle = {
     display: 'grid',
     gridTemplateColumns: `repeat(${BOARD_SIZE}, 1fr)`,
@@ -10,9 +13,12 @@ const LayerGrid = ({ layer, board, onCellClick, winningLine, disabled, layerInde
     padding: '12px',
     backgroundColor: 'rgba(37, 99, 235, 0.05)',
     borderRadius: '12px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    transform: `translateY(${layerIndex * -10}px)`,
-    zIndex: BOARD_SIZE - layerIndex,
+    transform: `translateZ(${zTranslate}px) scale(${scale})`,
+    transformStyle: 'preserve-3d',
+    position: 'absolute',
+    top: layerIndex * -10,
+    left: 0,
+    right: 0,
   };
 
   return (
@@ -26,6 +32,7 @@ const LayerGrid = ({ layer, board, onCellClick, winningLine, disabled, layerInde
             onClick={() => onCellClick(cellIndex)}
             highlighted={isHighlighted}
             disabled={disabled}
+            layerIndex={layerIndex}
           />
         );
       })}
